@@ -1,0 +1,439 @@
+
+"arch" <- function (gr) { 
+
+   # By Estefania Calparsoro (2017)
+   # Exploratory analysis of ceramic compositions 
+   # Based on M.J. Baxter and Jaume Buxeda i Garrigos variation matrix
+   # Using clr transformation for dendrograms with ggbiplot
+   # Using alr transformation for principal component analysis
+   # The chemical raw data is shown with the heatmap
+   # The compositional table for the group is written on the user directory
+   # scripts get_anids and tabla_grupos are used here apart from these packages:
+
+if (!require("gplots")) {
+   install.packages("gplots", dependencies = TRUE)
+   library(gplots)
+   }
+if (!require("ggbiplot")) {
+   install.packages("ggbiplot", dependencies = TRUE)
+   library(ggbiplot)
+   }
+
+if (!require("dendextend")) {
+   install.packages("dendextend", dependencies = TRUE)
+   library(dendextend)
+   }
+if (!require("devtools")) {
+   install.packages("devtools", dependencies = TRUE)
+   library(devtools)
+   }
+if (!require("compositions")) {
+   install.packages("compositions", dependencies = TRUE)
+   library(compositions)
+   }
+
+if (!require("gWidgets")) {
+   install.packages("gWidgets", dependencies = TRUE)
+   library(gWidgets)
+   }
+
+if (!require("lattice")) {
+   install.packages("lattice", dependencies = TRUE)
+   library(lattice)
+   }
+
+if (!require("latticeExtra")) {
+   install.packages("latticeExtra", dependencies = TRUE)
+   library(latticeExtra)
+   }
+
+
+if (!require("plotrix")) {
+   install.packages("plotrix", dependencies = TRUE)
+   library(plotrix)
+   }
+
+if (!require("d3heatmap")) {
+   install.packages("d3heatmap", dependencies = TRUE)
+   library(d3heatmap)
+   }
+
+if (!require("sm")) {
+   install.packages("sm", dependencies = TRUE)
+   library(sm)
+   }
+
+if (!require("dplyr")) {
+   install.packages("dplyr", dependencies = TRUE)
+   library(dplyr)
+   }
+
+if (!require("Rcmdr")) {
+   install.packages("Rcmdr", dependencies = TRUE)
+   library(Rcmdr)
+   }
+
+if (!require("xlsx")) {
+   install.packages("xlsx", dependencies = TRUE)
+   library(xlsx)
+   }
+
+if (!require("devEMF")) {
+   install.packages("devEMF", dependencies = TRUE)
+   library(devEMF)
+   }
+
+gr -> x
+x <-  gr[,-c(1:9)]
+y <- gr
+
+
+if (min(x) < 0) {
+   cat("Negative data - terminating.")
+   return()
+    }
+
+#evariation.matrix2#
+
+p <- dim(x)[2]
+        varmat <- matrix(0, p, p)
+        varmat2<-matrix(0,p+4,p)
+        for(i in 1:p) {
+            varmat[, i] <- diag(var(log(x/x[, i])))
+        }
+        varsum <- apply(varmat, 2, sum)
+        totvar <- sum(varmat)/(2 * p)
+        varprop <- totvar/varsum
+        varcor<-vector(mode="numeric",length=p)
+        for(i in 1:p) {
+            varcor[i]<-cor(varmat[-c(i),i],varsum[-i])
+        }
+        hola<-as.list(dimnames(x)[[2]])
+        par(mar=c(5,5,4,2)+0.1,mgp=c(3,1,0))
+        for(i in 1:p) {
+            plot(varsum[-i],varmat[-c(i),i], xlab=list(expression(tau[.i]),font=2,cex=1.5),ylab=list( paste("var(ln(x/", dimnames(x[i])[[2]],"))",sep=""),cex=1,font=2),type="n",cex.axis=0.8)
+            text(varsum[-i],varmat[-c(i),i], labels=dimnames(x[-i])[[2]],cex=0.5)
+            rvarcor<-round(varcor[i],dig=6)
+            text(min(varsum[-i]),max(varmat[-c(i),i]),label=bquote("r"[v*tau]*" = "*.(rvarcor)),cex=0.7,adj=0)
+        }
+        for(i in 1:p) varmat2[i,]<- varmat[i,]
+        varmat2[p+1,]<- varsum
+        varmat2[p+2,]<- varprop
+        varmat2[p+3,]<- varcor
+        varmat2[p+4,1]<- totvar
+        dimnames(varmat2)<-list(c(dimnames(x)[[2]],"t.i","vt/t.i","r v,t","vt"),c(dimnames(x)[[2]]))
+        cat("Values of vt/t.i (in Buxeda's notation).\n\nMaximum determines variable to use as divisor in subsequent log-ratio transformation.\n\n\n",
+            varprop, "\n\n")
+        ord <- order(varprop)
+        cat("Maximum value : ", max(varprop), "\n")
+        cat("Variable : ", ord[p], "\n")
+        list(varmat2=varmat2)
+
+
+#ivar <- ord[p] 
+
+#the variable with the minimum variability to use as a divisor in the alr transformation
+
+
+
+#CLR TRANSFORMATION + DENDROGRAMAS (para quitar elementos hay que quitarlos aquí)
+
+
+x.clr <- 
+   logcenter.tran(x)
+
+x.clr
+nrow(x.clr)
+
+clr_elements <-
+  
+
+HClust <- hclust(dist(model.matrix 
+          	   (~-1 +  
+                 Al2O3+Ba+CaO+Ce+Cr+Cs+Cu+Dy+Er+Eu+Fe2O3+Gd+Hf+Ho+K2O+La+Lu+
+          	    MgO+MnO+Nb+Nd+Ni+Pr+SiO2+Sm+Sr+Ta+Tb+Th+TiO2+Tm+U+V+Yb+Zn+Zr,   
+
+          	    x.clr
+			))^2 ,
+          	     method= "centroid"
+          	      )
+
+my_dend <- as.dendrogram(HClust)
+
+my_dend
+
+###### here columns are asigned to site, chrono, form… ###########
+
+groups_x_site    <- y[,7]
+
+groups_x_chrono  <- y[,6]
+
+groups_x_form    <- y[,9]
+
+groups_x_typo    <- y[,2]
+
+groups_x_CG      <- y[,5]
+
+###### ASIGN LABELS COLORS ###########
+
+
+labels_colors_site <- 
+	rainbow(nlevels(groups_x_site))[groups_x_site][order.dendrogram(my_dend)]
+		
+labels_colors_chrono<- 
+	rainbow(nlevels(groups_x_chrono))[groups_x_chrono][order.dendrogram(my_dend)]
+		
+labels_colors_form <- 
+	rainbow(nlevels(groups_x_form))[groups_x_form][order.dendrogram(my_dend)]
+		
+labels_colors_typo<- 
+	rainbow(nlevels(groups_x_typo))[groups_x_typo][order.dendrogram(my_dend)]
+		
+labels_colors_CG <- 
+	rainbow(nlevels(groups_x_CG))[groups_x_CG][order.dendrogram(my_dend)]
+	
+#(optional) chose different color palette or create customized one:
+ #rainbow(n), 
+ #heat.colors(n), 
+ #terrain.colors(n),
+ #topo.colors(n), 
+ #cm.colors(n).
+
+the_bars <-  (cbind(		#create color bars 
+	labels_colors_site,
+	labels_colors_chrono, 
+	labels_colors_form, 
+	labels_colors_typo, 
+	labels_colors_CG))
+
+my_dend <- set(my_dend, "labels_cex", 0.5)
+
+
+#Plot dendrograms: SITE 
+
+labels_colors(my_dend)<- 
+    labels_colors_site
+
+   par(mar = c(7,7,7,7)) #set legend scale
+   plot(my_dend,  horiz =  FALSE)
+   
+   legend("topright", legend = unique(groups_x_site), 
+          fill = unique(labels_colors_site))
+   
+   colored_bars(the_bars) # add the bars 
+
+
+#DENDRO CHRONO
+
+labels_colors(my_dend)<- 
+    labels_colors_chrono
+  
+    par(mar = c(7,7,7,7)) #set legend scale  
+    plot(my_dend,  horiz =  FALSE)
+    
+    legend("topright", legend = unique(groups_x_chrono),                                                           
+           fill = unique(labels_colors_chrono))
+
+    colored_bars(the_bars)
+
+
+#DENDRO FORM
+
+labels_colors(my_dend)<-
+     labels_colors_form
+
+    par(mar = c(7,7,7,7)) #set legend scale 
+    plot(my_dend,  horiz =  FALSE)
+
+    legend("topright", legend = unique(groups_x_form), 
+           fill = unique(labels_colors_form))
+
+    colored_bars(the_bars)
+
+
+
+#DENDRO TYPO
+
+
+labels_colors(my_dend)<- 
+    labels_colors_typo
+
+    par(mar = c(7,7,7,7)) #set legend scale 
+    plot(my_dend,  horiz =  FALSE)
+
+    legend("topright", legend = unique(groups_x_typo), 
+          fill = unique(labels_colors_typo))
+
+    colored_bars(the_bars)
+
+
+
+#PCA FROM ALR DATA SHOWING GROUPS
+
+x_alr <- 
+   alr(x, ord[p])   
+
+#additve log ratio transformation applied using 
+#the less varible element calculated in the variation matrix
+#alr function from compostions package
+x_alr
+
+PCA_labels <- row.names(x)
+
+#PCA_SITE
+
+x_site.pca <- 
+
+     ggbiplot(prcomp
+     (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_site, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_site.pca <- x_site.pca +
+   scale_color_discrete(name = 'Sites')
+
+x_site.pca <- x_site.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_site.pca)
+
+#PCA_CHRONO
+
+x_chrono.pca <- 
+
+     ggbiplot(prcomp
+     (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_chrono, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_chrono.pca <- x_chrono.pca +
+   scale_color_discrete(name = 'Chronologies')
+
+x_chrono.pca <- x_chrono.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_chrono.pca)
+
+
+#PCA_FORM
+
+x_form.pca <- 
+
+     ggbiplot(prcomp
+     (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_form, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_form.pca <- x_form.pca +
+   scale_color_discrete(name = 'Forms')
+
+x_form.pca <- x_form.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_form.pca)
+
+#PCA_TYPOLOGY
+
+x_typo.pca <- 
+
+    ggbiplot(prcomp
+    (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_typo, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_typo.pca <- x_typo.pca +
+   scale_color_discrete(name = 'Typologies')
+
+x_typo.pca <- x_typo.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_typo.pca)
+
+#get the table with the mean, SD and RSD, for the group. 
+
+  cat(tabla_grupo(gr))
+  cat(nrow(gr))
+
+
+
+
+
+
+#Final notes
+
+df.name <- deparse(substitute(gr)) #get the name of the df
+
+
+
+
+print(paste("Exploratory analysis where", colnames(x[ord[p]]), "has been used as a divisor for the additive log ratio transformation of", nrow(x), "ceramic samples"))
+
+print(df.name)
+
+summary(gr)
+
+print(get_anids(gr))
+nrow(x)
+
+
+#### Heatmap of the chemical composition ####
+   
+   mat_div <- t(t(x)/colMeans(x))
+   #get the relative values of each composition
+
+
+d3heatmap(mat_div,    #colors are based on these values
+          cellnote=x) #show the raw chemical data
+}
+
+
+
+
+
+
+
+
