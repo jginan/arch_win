@@ -1,7 +1,6 @@
 
 "arch" <- function (gr) { 
 
-   # By Estefania Calparsoro (2017)
    # Exploratory analysis of ceramic compositions 
    # Based on M.J. Baxter and Jaume Buxeda i Garrigos variation matrix
    # Using clr transformation for dendrograms with ggbiplot
