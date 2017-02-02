@@ -147,16 +147,7 @@ nrow(x.clr)
 
 clr_elements <-
   
-
-HClust <- hclust(dist(model.matrix 
-          	   (~-1 +  
-                 Al2O3+Ba+CaO+Ce+Cr+Cs+Cu+Dy+Er+Eu+Fe2O3+Gd+Hf+Ho+K2O+La+Lu+
-          	    MgO+MnO+Nb+Nd+Ni+Pr+SiO2+Sm+Sr+Ta+Tb+Th+TiO2+Tm+U+V+Yb+Zn+Zr,   
-
-          	    x.clr
-			))^2 ,
-          	     method= "centroid"
-          	      )
+HClust <- hclust(d = dist(x.clr)^2, method = "cen")
 
 my_dend <- as.dendrogram(HClust)
 
