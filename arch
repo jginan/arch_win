@@ -256,6 +256,19 @@ labels_colors(my_dend)<-
 
     colored_bars(the_bars)
 
+#DENDRO CG
+
+
+labels_colors(my_dend)<- 
+    labels_colors_CG
+
+    par(mar = c(7,7,7,7)) #set legend scale 
+    plot(my_dend,  horiz =  FALSE)
+
+    legend("topright", legend = unique(groups_x_CG), 
+          fill = unique(labels_colors_CG))
+
+    colored_bars(the_bars)
 
 
 #PCA FROM ALR DATA SHOWING GROUPS
@@ -382,6 +395,35 @@ x_typo.pca <- x_typo.pca +
          legend.position = 'top')
 
 plot(x_typo.pca)
+
+#PCA_CG
+
+x_typo.pca <- 
+
+    ggbiplot(prcomp
+    (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_CG, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_CG.pca <- x_typo.pca +
+   scale_color_discrete(name = 'Typologies')
+
+x_CG.pca <- x_typo.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_CG.pca)
+
 
 #get the table with the mean, SD and RSD, for the group. 
 
