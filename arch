@@ -154,15 +154,15 @@ my_dend
 
 ###### here columns are asigned to site, chrono, form… ###########
 
-groups_x_site    <- y[,7]
+groups_x_site    <- as.factor(y[,7])
 
-groups_x_chrono  <- y[,6]
+groups_x_chrono  <- as.factor(y[,6])
 
-groups_x_form    <- y[,9]
+groups_x_form    <- as.factor(y[,9])
 
-groups_x_typo    <- y[,2]
+groups_x_typo    <- as.factor(y[,2])
 
-groups_x_CG      <- y[,5]
+groups_x_CG      <- as.factor(y[,5])
 
 ###### ASIGN LABELS COLORS ###########
 
