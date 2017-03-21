@@ -7,7 +7,7 @@
    # Using alr transformation for principal component analysis
    # The chemical raw data is shown with the heatmap
    # The compositional table for the group is written on the user directory
-   # scripts: uniformitat, get_anids and means_table are used here apart from these packages:
+   # scripts: uniformitat, get_anids and means_sd are used here apart from these packages:
 
 if (!require("gplots")) {
    install.packages("gplots", dependencies = TRUE)
@@ -487,10 +487,9 @@ plot(x_CG.pca)
 
 #get the table with the mean, SD and RSD, for the group. 
 
-  cat(tabla_grupo(gr))
-  cat(nrow(gr))
+  cat(means_sd(x))
 
-
+print(paste("Includes", nrow(x),"samples"))
 
 
 
