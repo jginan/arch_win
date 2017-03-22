@@ -6,11 +6,11 @@ means_sd requires indicating the working directory
 
 In Windows ggbiplot may not be properly installed
     Solution: 
-        1- remove the option for installing ggbiplot
-        2- Try changing for this:
+        1. remove the option for installing ggbiplot
+        2. Try changing for this:
               library(devtools)
               install_github("vqv/ggbiplot")
-        3- If doesn't work. Try copying only the ggbiplot as a function (like means_sd and get_anids)
+        3. If doesn't work. Try copying only the ggbiplot as a function (like means_sd and get_anids)
         
  The csv must:
   1- CONTAIN 9 FIRST ROWS, (NOT INCLUDING THE ROW.NAMES ROW) AS FACTORS WITH ARCHAEOLOGICAL DATA
