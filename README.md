@@ -1,7 +1,10 @@
 # arch
 This is a script for exploratory analysis of archaeological ceramic compositions
+
 get_anids and means_sd be must loaded before 
+
 means_sd requires indicating the working directory
+
 
 In Windows ggbiplot may not be properly installed.
 
