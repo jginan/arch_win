@@ -5,12 +5,12 @@ get_anids and means_sd be must loaded before
 means_sd requires indicating the working directory
 
 In Windows ggbiplot may not be properly installed
-   Solution: 
-       - remove the option for installing ggbiplot
-       - Try changing for this:
-             library(devtools)
-			 install_github("vqv/ggbiplot")
-       - If doesn't work. Try copying only the ggbiplot as a function (like means_sd and get_anids)
+Solution: 
+ - remove the option for installing ggbiplot
+ - Try changing for this:
+      library(devtools)
+      install_github("vqv/ggbiplot")
+ - If doesn't work. Try copying only the ggbiplot as a function (like means_sd and get_anids)
         
  
  The csv must:
