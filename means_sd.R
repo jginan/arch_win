@@ -17,6 +17,6 @@ cbind(tf100r, sum$n) ->tf100rn
 print(tf100rn)
 
 
-write.xlsx(tf100rn,/working_directory/means_sd.xlsx")
+
 
 } 
