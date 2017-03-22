@@ -9,78 +9,6 @@
    # The compositional table for the group is written on the user directory
    # scripts: uniformitat, get_anids and means_sd are used here apart from these packages:
 
-if (!require("gplots")) {
-   install.packages("gplots", dependencies = TRUE)
-   library(gplots)
-   }
-if (!require("ggbiplot")) {
-   install.packages("ggbiplot", dependencies = TRUE)
-   library(ggbiplot)
-   }
-
-if (!require("dendextend")) {
-   install.packages("dendextend", dependencies = TRUE)
-   library(dendextend)
-   }
-if (!require("devtools")) {
-   install.packages("devtools", dependencies = TRUE)
-   library(devtools)
-   }
-if (!require("compositions")) {
-   install.packages("compositions", dependencies = TRUE)
-   library(compositions)
-   }
-
-if (!require("gWidgets")) {
-   install.packages("gWidgets", dependencies = TRUE)
-   library(gWidgets)
-   }
-
-if (!require("lattice")) {
-   install.packages("lattice", dependencies = TRUE)
-   library(lattice)
-   }
-
-if (!require("latticeExtra")) {
-   install.packages("latticeExtra", dependencies = TRUE)
-   library(latticeExtra)
-   }
-
-
-if (!require("plotrix")) {
-   install.packages("plotrix", dependencies = TRUE)
-   library(plotrix)
-   }
-
-if (!require("d3heatmap")) {
-   install.packages("d3heatmap", dependencies = TRUE)
-   library(d3heatmap)
-   }
-
-if (!require("sm")) {
-   install.packages("sm", dependencies = TRUE)
-   library(sm)
-   }
-
-if (!require("dplyr")) {
-   install.packages("dplyr", dependencies = TRUE)
-   library(dplyr)
-   }
-
-if (!require("Rcmdr")) {
-   install.packages("Rcmdr", dependencies = TRUE)
-   library(Rcmdr)
-   }
-
-if (!require("xlsx")) {
-   install.packages("xlsx", dependencies = TRUE)
-   library(xlsx)
-   }
-
-if (!require("devEMF")) {
-   install.packages("devEMF", dependencies = TRUE)
-   library(devEMF)
-   }
 
 gr -> x
 x <-  gr[,-c(1:9)]
@@ -100,7 +28,9 @@ nom <- "Data"
 mida.boxplot=10
 rang.boxplot=c(-4,4)
 
-     aaa<-length(talls)
+      options(scipen=100,digits=6)
+      windows(record=T)
+      aaa<-length(talls)
       bbb<- matrix(0,aaa,1)
       pop <- dim(x)[2]+1
       mat <- matrix(0, pop,1)
@@ -183,7 +113,6 @@ dev.off()
       Fitxer_ilr<-ilr(x,bases)
       par(mar=c(5,4,4,2)+0.1,mgp=c(3,1,0))
       list(MVC=MVC,Entropia=tmatentro$Entropia,Probabilitat= tmatentro$Probabilitat, Signary= Signary, Bases= bases, Fitxer_ilr= Fitxer_ilr)
-
 
 
 
