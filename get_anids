@@ -1,0 +1,10 @@
+
+get_anids  <-  function(x)
+
+{
+
+paste(as.character(noquote(row.names(x))
+), collapse=", ")
+
+
+} 
