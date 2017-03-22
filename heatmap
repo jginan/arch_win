@@ -1,5 +1,6 @@
 #### Heatmap of the chemical composition ####
-   
+library(d3heatamp)
+
    mat_div <- t(t(x)/colMeans(x))
    #get the relative values of each composition
 
