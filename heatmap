@@ -1,0 +1,8 @@
+#### Heatmap of the chemical composition ####
+   
+   mat_div <- t(t(x)/colMeans(x))
+   #get the relative values of each composition
+
+
+d3heatmap(mat_div,    #colors are based on these values
+          cellnote=x) #show the raw chemical data
