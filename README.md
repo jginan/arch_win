@@ -7,7 +7,9 @@ There are some scripts included in the repository that must be loaded.
       get_anids
       ggbiplot
 
+The heatmap can be executed externally, since is not working within the arch_win
 
+      heatmap
    
  
  The csv must:
