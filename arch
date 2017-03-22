@@ -118,7 +118,7 @@ dev.off()
 
 
 
-#ivar <- ord[p] this is used for the alr transormation in PCAs
+ivar <- ord[p] #this is used for the alr transormation in PCAs
 
 #ivar the variable with the minimum variability to use as a divisor in the alr transformation
 
@@ -263,7 +263,7 @@ labels_colors(my_dend)<-
 #PCA FROM ALR DATA SHOWING GROUPS
 
 x_alr <- 
-   alr(x, ord[p])   
+   alr(x, ivar) #ivar:ord[p]  minumun variable from the mvc/uniformitat
 
 #additve log ratio transformation applied using 
 #the less varible element calculated in the variation matrix
