@@ -1,4 +1,3 @@
-
 "arch" <- function (gr) { 
 
    # Exploratory analysis of ceramic compositions 
@@ -10,16 +9,59 @@
    # scripts: uniformitat, get_anids and means_sd are used here apart from these packages:
 
 
+if (!require("dendextend")) {
+    install.packages("dendextend", dependencies = TRUE)
+    library(dendextend)
+    }
+
+
+
 gr -> x
 x <-  gr[,-c(1:9)]
 y <- gr
 
+
+######evariation.matrix################
 
 if (min(x) < 0) {
    cat("Negative data - terminating.")
    return()
     }
 
+	p <- dim(x)[2]
+         varmat <- matrix(0, p, p)
+         varmat2<-matrix(0,p+4,p)
+         for(i in 1:p) {
+             varmat[, i] <- diag(var(log(x/x[, i])))
+         }
+         varsum <- apply(varmat, 2, sum)
+         totvar <- sum(varmat)/(2 * p)
+         varprop <- totvar/varsum
+         varcor<-vector(mode="numeric",length=p)
+         for(i in 1:p) {
+             varcor[i]<-cor(varmat[-c(i),i],varsum[-i])
+         }
+         hola<-as.list(dimnames(x)[[2]])
+         par(mar=c(5,5,4,2)+0.1,mgp=c(3,1,0))
+         for(i in 1:p) {
+             plot(varsum[-i],varmat[-c(i),i], xlab=list(expression(tau[.i]),font=2,cex=1.5),ylab=list( paste("var(ln(x/", dimnames(x[i])[[2]],"))",sep=""),cex=1,font=2),type="n",cex.axis=0.8)
+             text(varsum[-i],varmat[-c(i),i], labels=dimnames(x[-i])[[2]],cex=0.5)
+             rvarcor<-round(varcor[i],dig=6)
+             text(min(varsum[-i]),max(varmat[-c(i),i]),label=bquote("r"[v*tau]*" = "*.(rvarcor)),cex=0.7,adj=0)
+         }
+         for(i in 1:p) varmat2[i,]<- varmat[i,]
+         varmat2[p+1,]<- varsum
+         varmat2[p+2,]<- varprop
+         varmat2[p+3,]<- varcor
+         varmat2[p+4,1]<- totvar
+         dimnames(varmat2)<-list(c(dimnames(x)[[2]],"t.i","vt/t.i","r v,t","vt"),c(dimnames(x)[[2]]))
+         cat("Values of vt/t.i (in Buxeda's notation).\n\nMaximum determines variable to use as divisor in subsequent log-ratio transformation.\n\n\n",
+             varprop, "\n\n")
+         ord <- order(varprop)
+         cat("Maximum value : ", max(varprop), "\n")
+         cat("Variable : ", ord[p], "\n")
+         list(varmat2=varmat2)
+ 
 ######Uniformitat################
 
 
@@ -28,9 +70,7 @@ nom <- "Data"
 mida.boxplot=10
 rang.boxplot=c(-4,4)
 
-      options(scipen=100,digits=6)
-      windows(record=T)
-      aaa<-length(talls)
+     aaa<-length(talls)
       bbb<- matrix(0,aaa,1)
       pop <- dim(x)[2]+1
       mat <- matrix(0, pop,1)
@@ -115,10 +155,16 @@ dev.off()
       list(MVC=MVC,Entropia=tmatentro$Entropia,Probabilitat= tmatentro$Probabilitat, Signary= Signary, Bases= bases, Fitxer_ilr= Fitxer_ilr)
 
 
+mat_div <- t(t(x)/colMeans(x))
+   #get the relative values of each composition
+
+
+d3heatmap(mat_div,    #colors are based on these values
+          cellnote=x) #show the raw chemical data
 
 
 
-ivar <- ord[p] #this is used for the alr transormation in PCAs
+#ivar <- ord[p] #this is used for the alr transormation in PCAs
 
 #ivar the variable with the minimum variability to use as a divisor in the alr transformation
 
@@ -263,7 +309,7 @@ labels_colors(my_dend)<-
 #PCA FROM ALR DATA SHOWING GROUPS
 
 x_alr <- 
-   alr(x, ivar) #ivar:ord[p]  minumun variable from the mvc/uniformitat
+   alr(x, ord[p])   
 
 #additve log ratio transformation applied using 
 #the less varible element calculated in the variation matrix
@@ -284,9 +330,9 @@ x_site.pca <-
 	scale.= TRUE,
     obs.scale = 1, 
     var.scale = 0.5, 
-    groups = groups_x_site, 
+    groups = groups_x_site, 
     ellipse = FALSE, 
-    circle = FALSE,
+    circle = FALSE,
     varname.size= 4, 
     varname.adjust= TRUE)
 
@@ -296,7 +342,7 @@ x_site.pca <- x_site.pca +
 
 x_site.pca <- x_site.pca +
    theme(legend.direction = 'horizontal', 
-         legend.position = 'top')
+         legend.position = 'top')
 
 plot(x_site.pca)
 
@@ -312,9 +358,9 @@ x_chrono.pca <-
 	scale.= TRUE,
     obs.scale = 1, 
     var.scale = 0.5, 
-    groups = groups_x_chrono, 
+    groups = groups_x_chrono, 
     ellipse = FALSE, 
-    circle = FALSE,
+    circle = FALSE,
     varname.size= 4, 
     varname.adjust= TRUE)
 
@@ -324,7 +370,7 @@ x_chrono.pca <- x_chrono.pca +
 
 x_chrono.pca <- x_chrono.pca +
    theme(legend.direction = 'horizontal', 
-         legend.position = 'top')
+         legend.position = 'top')
 
 plot(x_chrono.pca)
 
@@ -341,9 +387,9 @@ x_form.pca <-
 	scale.= TRUE,
     obs.scale = 1, 
     var.scale = 0.5, 
-    groups = groups_x_form, 
+    groups = groups_x_form, 
     ellipse = FALSE, 
-    circle = FALSE,
+    circle = FALSE,
     varname.size= 4, 
     varname.adjust= TRUE)
 
@@ -353,7 +399,7 @@ x_form.pca <- x_form.pca +
 
 x_form.pca <- x_form.pca +
    theme(legend.direction = 'horizontal', 
-         legend.position = 'top')
+         legend.position = 'top')
 
 plot(x_form.pca)
 
@@ -369,9 +415,9 @@ x_typo.pca <-
 	scale.= TRUE,
     obs.scale = 1, 
     var.scale = 0.5, 
-    groups = groups_x_typo, 
+    groups = groups_x_typo, 
     ellipse = FALSE, 
-    circle = FALSE,
+    circle = FALSE,
     varname.size= 4, 
     varname.adjust= TRUE)
 
@@ -381,7 +427,7 @@ x_typo.pca <- x_typo.pca +
 
 x_typo.pca <- x_typo.pca +
    theme(legend.direction = 'horizontal', 
-         legend.position = 'top')
+         legend.position = 'top')
 
 plot(x_typo.pca)
 
@@ -397,9 +443,9 @@ x_typo.pca <-
 	scale.= TRUE,
     obs.scale = 1, 
     var.scale = 0.5, 
-    groups = groups_x_CG, 
+    groups = groups_x_CG, 
     ellipse = FALSE, 
-    circle = FALSE,
+    circle = FALSE,
     varname.size= 4, 
     varname.adjust= TRUE)
 
@@ -409,14 +455,24 @@ x_CG.pca <- x_typo.pca +
 
 x_CG.pca <- x_typo.pca +
    theme(legend.direction = 'horizontal', 
-         legend.position = 'top')
+         legend.position = 'top')
 
 plot(x_CG.pca)
 
 
+#### Heatmap of the chemical composition ####
+   
+mat_div <- t(t(x)/colMeans(x))
+   #get the relative values of each composition
+
+
+d3heatmap(mat_div,    #colors are based on these values
+          cellnote=x) #show the raw chemical data
+
+
 #get the table with the mean, SD and RSD, for the group. 
 
-  cat(means_sd(x))
+  #cat(means_sd(x))
 
 print(paste("Includes", nrow(x),"samples"))
 
@@ -440,16 +496,9 @@ print(get_anids(gr))
 nrow(x)
 
 
-#### Heatmap of the chemical composition ####
    
-   mat_div <- t(t(x)/colMeans(x))
-   #get the relative values of each composition
 
-
-d3heatmap(mat_div,    #colors are based on these values
-          cellnote=x) #show the raw chemical data
 }
-
 
 
 
