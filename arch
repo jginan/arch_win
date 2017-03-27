@@ -243,7 +243,7 @@ labels_colors(my_dend)<-
    plot(my_dend,  horiz =  FALSE)
    
    legend("topright", legend = unique(groups_x_site), 
-          fill = unique(labels_colors_site))
+          fill = unique(rainbow(nlevels(groups_x_site))[groups_x_site]))
    
    colored_bars(the_bars) # add the bars 
 
@@ -257,7 +257,7 @@ labels_colors(my_dend)<-
     plot(my_dend,  horiz =  FALSE)
     
     legend("topright", legend = unique(groups_x_chrono),                                                           
-           fill = unique(labels_colors_chrono))
+          fill = unique(rainbow(nlevels(groups_x_chrono)[groups_x_chrono]))
 
     colored_bars(the_bars)
 
@@ -271,7 +271,7 @@ labels_colors(my_dend)<-
     plot(my_dend,  horiz =  FALSE)
 
     legend("topright", legend = unique(groups_x_form), 
-           fill = unique(labels_colors_form))
+          fill = unique(rainbow(nlevels(groups_x_form)[groups_x_form]))
 
     colored_bars(the_bars)
 
@@ -287,7 +287,7 @@ labels_colors(my_dend)<-
     plot(my_dend,  horiz =  FALSE)
 
     legend("topright", legend = unique(groups_x_typo), 
-          fill = unique(labels_colors_typo))
+          fill = unique(rainbow(nlevels(groups_x_typo)[groups_x_typo]))
 
     colored_bars(the_bars)
 
@@ -301,7 +301,7 @@ labels_colors(my_dend)<-
     plot(my_dend,  horiz =  FALSE)
 
     legend("topright", legend = unique(groups_x_CG), 
-          fill = unique(labels_colors_CG))
+          fill = unique(rainbow(nlevels(groups_x_CG)[groups_x_CG]))
 
     colored_bars(the_bars)
 
