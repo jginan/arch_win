@@ -1,0 +1,423 @@
+
+"arch_pca" <- function (gr) { 
+
+   # Exploratory analysis of ceramic compositions 
+   # Based on M.J. Baxter and Jaume Buxeda i Garrigos variation matrix
+   # Using clr transformation for dendrograms with ggbiplot
+   # Using alr transformation for principal component analysis
+   # The chemical raw data is shown with the heatmap
+   # The compositional table for the group is written on the user directory
+   # scripts: uniformitat, get_anids and means_sd are used here apart from these packages:
+
+if (!require("gplots")) {
+   install.packages("gplots", dependencies = TRUE)
+   library(gplots)
+   }
+if (!require("ggbiplot")) {
+   install.packages("ggbiplot", dependencies = TRUE)
+   library(ggbiplot)
+   }
+
+if (!require("dendextend")) {
+   install.packages("dendextend", dependencies = TRUE)
+   library(dendextend)
+   }
+if (!require("devtools")) {
+   install.packages("devtools", dependencies = TRUE)
+   library(devtools)
+   }
+if (!require("compositions")) {
+   install.packages("compositions", dependencies = TRUE)
+   library(compositions)
+   }
+
+if (!require("gWidgets")) {
+   install.packages("gWidgets", dependencies = TRUE)
+   library(gWidgets)
+   }
+
+if (!require("lattice")) {
+   install.packages("lattice", dependencies = TRUE)
+   library(lattice)
+   }
+
+if (!require("latticeExtra")) {
+   install.packages("latticeExtra", dependencies = TRUE)
+   library(latticeExtra)
+   }
+
+
+if (!require("plotrix")) {
+   install.packages("plotrix", dependencies = TRUE)
+   library(plotrix)
+   }
+
+if (!require("d3heatmap")) {
+   install.packages("d3heatmap", dependencies = TRUE)
+   library(d3heatmap)
+   }
+
+if (!require("sm")) {
+   install.packages("sm", dependencies = TRUE)
+   library(sm)
+   }
+
+if (!require("dplyr")) {
+   install.packages("dplyr", dependencies = TRUE)
+   library(dplyr)
+   }
+
+if (!require("Rcmdr")) {
+   install.packages("Rcmdr", dependencies = TRUE)
+   library(Rcmdr)
+   }
+
+if (!require("xlsx")) {
+   install.packages("xlsx", dependencies = TRUE)
+   library(xlsx)
+   }
+
+if (!require("devEMF")) {
+   install.packages("devEMF", dependencies = TRUE)
+   library(devEMF)
+   }
+
+gr -> x
+x <-  gr[,-c(1:9)]
+y <- gr
+
+
+if (min(x) < 0) {
+   cat("Negative data - terminating.")
+   return()
+    }
+
+######Uniformitat################
+
+
+talls=c(0.3, 0.5, 0.9)
+nom <- "Data"
+mida.boxplot=10
+rang.boxplot=c(-4,4)
+
+     aaa<-length(talls)
+      bbb<- matrix(0,aaa,1)
+      pop <- dim(x)[2]+1
+      mat <- matrix(0, pop,1)
+      MVC<-evariation.matrix2(x)
+      MVC<-as.data.frame(MVC$varmat)
+      tMVC<-as.data.frame(t(MVC))
+      ordre<-order(tMVC[,c(pop)],decreasing=T)
+      tMVC<-as.data.frame(tMVC[ordre,])
+      for(i in 1:(pop-1)) {
+    mat[i,1] <- tMVC[i, pop]
+    }
+      mat[pop,1]<-MVC[pop+3,1]
+      dimnames(mat)[[1]]<-c(dimnames(tMVC)[[1]], "vt")
+      tmat<-t(mat[c(1:pop-1),])
+      tmatentro<-entropia02(tmat-mat[pop,1])
+      par(mar=c(5,5,4,2)+0.1,mgp=c(3,1,0))
+      if (nom=="NA") {
+      plot(mat[,1], type="p",pch=16,ylab=list(expression(tau[.i]),font=2,cex=2),xlab="",xaxt="n",ylim=c(0, trunc(mat[1,1]) +1),cex.axis=0.8)      
+      }
+      else {
+      plot(mat[,1], type="p",pch=16,ylab=list(expression(tau[.i]),font=2,cex=2),xlab="",xaxt="n",ylim=c(0, trunc(mat[1,1]) +1),cex.axis=0.8,main=bquote(paste(.(nom)," (n = ",.(dim(x)[1]),")")))
+      }
+      eti<-etiquetes.elements(mat)
+      #axis(1, at=1:pop, labels=dimnames(mat)[[1]],font=2, las=2)
+      axis(1, at=1:pop, labels=eti, font=2, las=2)
+      lines(mat[c(1:pop-1),1])
+      lines(c(0,pop),c(mat[pop,1],mat[pop,1]),lty=3)
+      for (i in 1:aaa) {
+                 bbb[i,1]<-length(which(MVC[pop+1,]<talls[i]))
+      if (bbb[i,1]>0) {
+                 segments(bbb[i,1]+0.5, par("usr")[3], bbb[i,1]+0.5, (mat[pop,1]*2.5)+(mat[pop,1]/talls[i]),lty=3)
+                 boxed.labels(bbb[i,1]+0.5,mat[pop,1]/2,talls[i],cex=0.6, col="black", bg="white",border=NA)
+                      }
+                       }
+      h2<-round(tmatentro$Entropia[1,pop],dig=2)
+      h2p<- round(tmatentro$Entropia[1,pop+1]*100,dig=2)
+      vt<-round(mat[pop,1],dig=2)
+      text(pop-5, (trunc(mat[1,1]) +1)-((trunc(mat[1,1]) +1)/14),label=bquote("    "*"H"[2]*" = "*.(h2)*" Sh"),cex=0.8,adj=0)
+      text(pop-5, (trunc(mat[1,1]) +1)- ((trunc(mat[1,1]) +1)/8.5),label=bquote("H"[2]*" % = "*.(h2p)),cex=0.8,adj=0)
+      text(pop-5, (trunc(mat[1,1]) +1)- ((trunc(mat[1,1]) +1)/6.2),label=bquote("     "*"vt = "*.(vt)),cex=0.8,adj=0)
+xxx<-recordPlot()
+      #ara fem el dendrograma de la MVC
+      dendroMVC<-hclust(as.dist(MVC[c(1:(dim(MVC)[2])),]),"ave")
+    for (i in 1:(dim(MVC)[2])) {
+    if (regexpr ("^Fe2O3$",as.character(dendroMVC[[4]][i]))==T) dendroMVC[[4]][i]<-expression("Fe"["2"]*"O"["3"])
+    if (regexpr ("^Al2O3$", as.character(dendroMVC[[4]][i]))==T) dendroMVC[[4]][i]<-expression("Al"["2"]*"O"["3"])
+    if (regexpr ("^P2O5$", as.character(dendroMVC[[4]][i]))==T) dendroMVC[[4]][i]<-expression("P"["2"]*"O"["5"])
+    if (regexpr ("^TiO2$", as.character(dendroMVC[[4]][i]))==T) dendroMVC[[4]][i]<-expression("TiO"["2"])
+    if (regexpr ("^Na2O$", as.character(dendroMVC[[4]][i]))==T) dendroMVC[[4]][i]<-expression("Na"["2"]*"O")
+    if (regexpr ("^K2O$", as.character(dendroMVC[[4]][i]))==T) dendroMVC[[4]][i]<-expression("K"["2"]*"O")
+    if (regexpr ("^SiO2$", as.character(dendroMVC[[4]][i]))==T) dendroMVC[[4]][i]<-expression("SiO"["2"])
+    }
+      plot(as.dendrogram(dendroMVC))
+yyy<-recordPlot()
+    # ara fem el signary
+    classi<-classifica(dendroMVC)
+    Signary<-as.data.frame(t(classi$signary))
+    dimnames(Signary)[[1]]<-dimnames(x)[[2]]
+    CoDaDendrogram(acomp(x),signary=Signary, border="red4", col="goldenrod3", type="boxplot", box.space=mida.boxplot, range=rang.boxplot)
+zzz<-recordPlot()
+emf("uniformitat.emf")
+replayPlot(xxx)
+dev.off()
+pdf("uniformitat.pdf")
+replayPlot(xxx)
+dev.off()
+emf("dendroMVC.emf")
+replayPlot(yyy)
+dev.off()
+pdf("dendroMVC.pdf")
+replayPlot(yyy)
+dev.off()
+emf("CoDaDendro.emf")
+replayPlot(zzz)
+dev.off()
+pdf("CoDaDendro.pdf")
+replayPlot(zzz)
+dev.off()
+      bases<-gsi.buildilrBase(Signary)
+      Fitxer_ilr<-ilr(x,bases)
+      par(mar=c(5,4,4,2)+0.1,mgp=c(3,1,0))
+      list(MVC=MVC,Entropia=tmatentro$Entropia,Probabilitat= tmatentro$Probabilitat, Signary= Signary, Bases= bases, Fitxer_ilr= Fitxer_ilr)
+
+
+
+
+
+
+#ivar <- ord[p] this is used for the alr transormation in PCAs
+
+#ivar the variable with the minimum variability to use as a divisor in the alr transformation
+
+###### here columns are asigned to site, chrono, form… ###########
+
+groups_x_site    <- as.factor(y[,7])
+
+groups_x_chrono  <- as.factor(y[,6])
+
+groups_x_form    <- as.factor(y[,9])
+
+groups_x_typo    <- as.factor(y[,2])
+
+groups_x_CG      <- as.factor(y[,5])
+
+###### ASIGN LABELS COLORS ###########
+
+
+labels_colors_site <- 
+	rainbow(nlevels(groups_x_site))[groups_x_site][order.dendrogram(my_dend)]
+		
+labels_colors_chrono<- 
+	rainbow(nlevels(groups_x_chrono))[groups_x_chrono][order.dendrogram(my_dend)]
+		
+labels_colors_form <- 
+	rainbow(nlevels(groups_x_form))[groups_x_form][order.dendrogram(my_dend)]
+		
+labels_colors_typo<- 
+	rainbow(nlevels(groups_x_typo))[groups_x_typo][order.dendrogram(my_dend)]
+		
+labels_colors_CG <- 
+	rainbow(nlevels(groups_x_CG))[groups_x_CG][order.dendrogram(my_dend)]
+	
+
+#PCA FROM ALR DATA SHOWING GROUPS
+
+x_alr <- 
+   alr(x, ord[p])   
+
+#additve log ratio transformation applied using 
+#the less varible element calculated in the variation matrix
+#alr function from compostions package
+x_alr
+
+PCA_labels <- row.names(x)
+
+#PCA_SITE
+
+x_site.pca <- 
+
+     ggbiplot(prcomp
+     (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_site, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_site.pca <- x_site.pca +
+   scale_color_discrete(name = 'Sites')
+
+x_site.pca <- x_site.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_site.pca)
+
+#PCA_CHRONO
+
+x_chrono.pca <- 
+
+     ggbiplot(prcomp
+     (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_chrono, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_chrono.pca <- x_chrono.pca +
+   scale_color_discrete(name = 'Chronologies')
+
+x_chrono.pca <- x_chrono.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_chrono.pca)
+
+
+#PCA_FORM
+
+x_form.pca <- 
+
+     ggbiplot(prcomp
+     (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_form, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_form.pca <- x_form.pca +
+   scale_color_discrete(name = 'Forms')
+
+x_form.pca <- x_form.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_form.pca)
+
+#PCA_TYPOLOGY
+
+x_typo.pca <- 
+
+    ggbiplot(prcomp
+    (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_typo, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_typo.pca <- x_typo.pca +
+   scale_color_discrete(name = 'Typologies')
+
+x_typo.pca <- x_typo.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_typo.pca)
+
+#PCA_CG
+
+x_typo.pca <- 
+
+    ggbiplot(prcomp
+    (x_alr),
+	#choices = 2,  #principal components number to include 
+	labels= PCA_labels, 
+	center= TRUE, 
+	scale.= TRUE,
+    obs.scale = 1, 
+    var.scale = 0.5, 
+    groups = groups_x_CG, 
+    ellipse = FALSE, 
+    circle = FALSE,
+    varname.size= 4, 
+    varname.adjust= TRUE)
+
+#add legend:
+x_CG.pca <- x_typo.pca +
+   scale_color_discrete(name = 'Typologies')
+
+x_CG.pca <- x_typo.pca +
+   theme(legend.direction = 'horizontal', 
+         legend.position = 'top')
+
+plot(x_CG.pca)
+
+
+#get the table with the mean, SD and RSD, for the group. 
+
+  cat(means_sd(x))
+
+print(paste("Includes", nrow(x),"samples"))
+
+
+
+
+#Final notes
+
+df.name <- deparse(substitute(gr)) #get the name of the df
+
+
+
+
+print(paste("Exploratory analysis where", colnames(x[ord[p]]), "has been used as a divisor for the additive log ratio transformation of", nrow(x), "ceramic samples"))
+
+print(df.name)
+
+summary(gr)
+
+print(get_anids(gr))
+nrow(x)
+
+
+#### Heatmap of the chemical composition ####
+   
+   mat_div <- t(t(x)/colMeans(x))
+   #get the relative values of each composition
+
+
+d3heatmap(mat_div,    #colors are based on these values
+          cellnote=x) #show the raw chemical data
+}
+
+
+
+
+
+
+
+
