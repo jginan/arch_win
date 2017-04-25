@@ -155,12 +155,9 @@ dev.off()
       list(MVC=MVC,Entropia=tmatentro$Entropia,Probabilitat= tmatentro$Probabilitat, Signary= Signary, Bases= bases, Fitxer_ilr= Fitxer_ilr)
 
 
-mat_div <- t(t(x)/colMeans(x))
-   #get the relative values of each composition
+#mat_div <- t(t(x)/colMeans(x))
+#get the relative values of each composition
 
-
-d3heatmap(mat_div,    #colors are based on these values
-          cellnote=x) #show the raw chemical data
 
 
 
@@ -245,7 +242,7 @@ labels_colors(my_dend)<-
    legend("topright", legend = unique(groups_x_site), 
           fill = unique(rainbow(nlevels(groups_x_site))[groups_x_site]))
    
-   colored_bars(the_bars) # add the bars 
+ #  colored_bars(the_bars) # add the bars 
 
 
 #DENDRO CHRONO
@@ -258,14 +255,13 @@ labels_colors(my_dend)<-
     
     legend("topright", legend = unique(groups_x_chrono),                                                           
           fill = unique(rainbow(nlevels(groups_x_chrono)[groups_x_chrono]))
-
-    colored_bars(the_bars)
+	
+#	colored_bars(the_bars) # add the bars 
 
 
 #DENDRO FORM
 
-labels_colors(my_dend)<-
-     labels_colors_form
+labels_colors(my_dend)<-  labels_colors_form 
 
     par(mar = c(7,7,7,7)) #set legend scale 
     plot(my_dend,  horiz =  FALSE)
@@ -273,7 +269,7 @@ labels_colors(my_dend)<-
     legend("topright", legend = unique(groups_x_form), 
           fill = unique(rainbow(nlevels(groups_x_form)[groups_x_form]))
 
-    colored_bars(the_bars)
+   # colored_bars(the_bars)
 
 
 
@@ -289,7 +285,7 @@ labels_colors(my_dend)<-
     legend("topright", legend = unique(groups_x_typo), 
           fill = unique(rainbow(nlevels(groups_x_typo)[groups_x_typo]))
 
-    colored_bars(the_bars)
+  #  colored_bars(the_bars)
 
 #DENDRO CG
 
@@ -303,7 +299,7 @@ labels_colors(my_dend)<-
     legend("topright", legend = unique(groups_x_CG), 
           fill = unique(rainbow(nlevels(groups_x_CG)[groups_x_CG]))
 
-    colored_bars(the_bars)
+  #  colored_bars(the_bars)
 
 
 #PCA FROM ALR DATA SHOWING GROUPS
@@ -462,38 +458,38 @@ plot(x_CG.pca)
 
 #### Heatmap of the chemical composition ####
    
-mat_div <- t(t(x)/colMeans(x))
+#mat_div <- t(t(x)/colMeans(x))
    #get the relative values of each composition
 
 
-d3heatmap(mat_div,    #colors are based on these values
-          cellnote=x) #show the raw chemical data
+#d3heatmap(mat_div,    #colors are based on these values
+#          cellnote=x) #show the raw chemical data
 
 
 #get the table with the mean, SD and RSD, for the group. 
 
   #cat(means_sd(x))
 
-print(paste("Includes", nrow(x),"samples"))
+#print(paste("Includes", nrow(x),"samples"))
 
 
 
 
 #Final notes
 
-df.name <- deparse(substitute(gr)) #get the name of the df
+#df.name <- deparse(substitute(gr)) #get the name of the df
 
 
 
 
-print(paste("Exploratory analysis where", colnames(x[ord[p]]), "has been used as a divisor for the additive log ratio transformation of", nrow(x), "ceramic samples"))
+#print(paste("Exploratory analysis where", colnames(x[ord[p]]), "has been used as a divisor for the additive log ratio transformation of", nrow(x), "ceramic samples"))
 
-print(df.name)
+#print(df.name)
 
-summary(gr)
+#summary(gr)
 
-print(get_anids(gr))
-nrow(x)
+#print(get_anids(gr))
+#nrow(x)
 
 
    
